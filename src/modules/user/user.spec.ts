@@ -3,17 +3,17 @@ import { UsersService } from './user.service';
 import { UserController } from './user.controller';
 import { BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../../config/database/prisma.service';
-import { User } from '@prisma/client';
-import { createUserDTO } from './user.dto';
+import { userDummy } from '../../../test/mocks/dummies';
+import { PrismaServiceMock, UserServiceMock } from '../../../test/mocks/service-mocks';
 
 describe('User Service', () => {
   let userService: UsersService;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      providers: [UsersService, {
+      providers: [ UsersService, {
         provide: PrismaService,
-        useClass: prismaMock
+        useClass: PrismaServiceMock
       }],
     }).compile();
 
@@ -28,14 +28,7 @@ describe('User Service', () => {
         password: 'password',
       });
 
-      expect(result).toHaveProperty('name');
-      expect(result).toHaveProperty('email');
-      expect(result).toHaveProperty('password');
-      expect(result).toHaveProperty('profilePicUrl');
-      expect(result).toHaveProperty('publicKey');
-      expect(result).toHaveProperty('privateKey');
-      expect(result).toHaveProperty('createdAt');
-      expect(result).toHaveProperty('updatedAt');
+      expect(Object.keys(result)).toStrictEqual(Object.keys(userDummy));
     });
   });
   
@@ -91,21 +84,13 @@ describe('User Service', () => {
     });
   });
   
-
   describe('[getUser]', () => {
     it('should return a user', async () => {
       const result = await userService.getUser({
         email: 'existent@user.com',
       });
 
-      expect(result).toHaveProperty('name');
-      expect(result).toHaveProperty('email');
-      expect(result).toHaveProperty('password');
-      expect(result).toHaveProperty('profilePicUrl');
-      expect(result).toHaveProperty('publicKey');
-      expect(result).toHaveProperty('privateKey');
-      expect(result).toHaveProperty('createdAt');
-      expect(result).toHaveProperty('updatedAt');
+      expect(Object.keys(result)).toStrictEqual(Object.keys(userDummy));
     });
   });
 
@@ -129,14 +114,14 @@ describe('User Controller', () => {
       controllers: [UserController],
       providers: [{
         provide: UsersService,
-        useClass: userServiceMock,
+        useClass: UserServiceMock,
       }],
     }).compile();
 
     userController = app.get<UserController>(UserController);
   });
 
-  describe('create user', () => {
+  describe('[create user]', () => {
     it('should return a user', async () => {
       const req: any = {
         body: {
@@ -145,41 +130,59 @@ describe('User Controller', () => {
           password: 'password',
         }
       }
-      expect(await userController.createUser(req)).toHaveProperty('createdAt');
+
+      const result = await userController.createUser(req);
+
+      expect(Object.keys(result)).toStrictEqual(Object.keys(userDummy));
     });
   });
 
-});
-
-const userDummy: User = {
-  id: '1234-5678-9101',
-  name: 'John',
-  email: 'existent@user.com',
-  password: '$2b$10$cXXkaB5RsrAzHKjLovamqORZJQAt5.Gk4SUyrI/LsnSwlqlHtgYlC',
-  profilePicUrl: '',
-  privateKey: '',
-  publicKey: '',
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-class userServiceMock {
-  createUser({name, email, password}: createUserDTO):User{
-    return userDummy;
-  }
-}
-
-class prismaMock {
-  private user = {
-    findUnique: (condition) => {
-      if(condition.where?.email === 'existent@user.com'){
-        return userDummy;
+  describe('[create user] name invalid', () => {
+    it('should return a Name is required error', async () => {
+      const req: any = {
+        body: {
+          email: 'john@example.com',
+          password: 'password',
+        }
       }
 
-      return false
-    },
-    create: (condition) => {
-      return userDummy;
-    }
-  };
-}
+      const result:any = await userController.createUser(req)
+
+      expect(result instanceof BadRequestException).toBe(true);
+      expect(result.message).toBe('Name is required');
+    })
+  });
+
+  describe('[create user] email invalid', () => {
+    it('should return a Email is required error', async () => {
+      const req: any = {
+        body: {
+          name: 'John',
+          password: 'password',
+        }
+      }
+
+      const result:any = await userController.createUser(req)
+
+      expect(result instanceof BadRequestException).toBe(true);
+      expect(result.message).toBe('Email is required');
+    })
+  })
+  
+  describe('[create user] password invalid', () => {
+    it('should return a Name is required', async () => {
+      const req: any = {
+        body: {
+          name: 'John',
+          email: 'john@example.com',
+        }
+      }
+
+      const result:any = await userController.createUser(req)
+
+      expect(result instanceof BadRequestException).toBe(true);
+      expect(result.message).toBe('Password is required');
+    })
+  })
+
+});

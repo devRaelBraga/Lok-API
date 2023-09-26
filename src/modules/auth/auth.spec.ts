@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UsersService } from '../user/user.service';
-import { User } from '@prisma/client';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
-import { loginReturnDTO } from './auth.dto';
+import { jwtTokenDummy } from '../../../test/mocks/dummies';
+import { AuthServiceMock, JwtServiceMock, UserServiceMock } from '../../../test/mocks/service-mocks';
 
 describe('Auth Service', () => {
   let authService: AuthService;
@@ -31,11 +31,7 @@ describe('Auth Service', () => {
           password: 'password'
       })
 
-      expect(result).toHaveProperty('name');
-      expect(result).toHaveProperty('email');
-      expect(result).toHaveProperty('profilePicUrl');
-      expect(result).toHaveProperty('privateKey');
-      expect(result).toHaveProperty('token');
+      expect(Object.keys(result)).toStrictEqual(Object.keys(jwtTokenDummy));
     });
   });
 
@@ -79,11 +75,7 @@ describe('Auth Controller', () => {
       
       const result = await authController.login(req)
 
-      expect(result).toHaveProperty('name');
-      expect(result).toHaveProperty('email');
-      expect(result).toHaveProperty('profilePicUrl');
-      expect(result).toHaveProperty('privateKey');
-      expect(result).toHaveProperty('token');
+      expect(Object.keys(result)).toStrictEqual(Object.keys(jwtTokenDummy));
     });
   });
 
@@ -118,40 +110,3 @@ describe('Auth Controller', () => {
   });
 
 });
-
-class UserServiceMock {
-  private userDummy: User = {
-    id: '1234-5678-9101',
-    name: 'John',
-    email: 'existent@user.com',
-    password: '$2b$10$cXXkaB5RsrAzHKjLovamqORZJQAt5.Gk4SUyrI/LsnSwlqlHtgYlC',
-    profilePicUrl: '',
-    privateKey: '',
-    publicKey: '',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-    async getUser({email}): Promise<User> {
-        return this.userDummy;
-    }
-}
-
-class AuthServiceMock {
-  private jwtTokenDummy:loginReturnDTO = {
-    name: 'name',
-    email: 'email', 
-    profilePicUrl: 'profilePicUrl',
-    privateKey: 'privateKey',
-    token: 'token'
-  }
-
-  async login({email, password}){
-    return this.jwtTokenDummy
-  }
-}
-
-class JwtServiceMock {
-  async signAsync(payload: any): Promise<string>{
-    return 'token';
-  }
-}
