@@ -74,4 +74,23 @@ export class UsersService {
         }
 
     }
+
+    async getUserById({id}:{id:string}): Promise<User> {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id
+                }
+            });
+
+            if(!user){
+                throw new BadRequestException('User not found');
+            }
+
+            return user;
+            
+        } catch (error) {
+            return error;
+        }
+    }
 }
