@@ -1,15 +1,20 @@
-import { User } from "@prisma/client";
-import { jwtTokenDummy, userDummy } from "./dummies";
+import { Message, User } from "@prisma/client";
+import { jwtTokenDummy, messageDummy, userDummy } from "./dummies";
 import { loginReturnDTO } from "src/modules/auth/auth.dto";
 import { createUserDTO } from "src/modules/user/user.dto";
+import { UsersService } from "src/modules/user/user.service";
 
 export class UserServiceMock {
     async getUser({email}): Promise<User> {
         return userDummy;
     }
 
-    createUser({name, email, password}: createUserDTO):User{
+    async createUser({name, email, password}: createUserDTO):Promise<User>{
         return userDummy;
+    }
+
+    async getUserById({ id }: { id: string; }): Promise<User> {
+      return userDummy;
     }
 }
 
@@ -36,6 +41,19 @@ export class PrismaServiceMock {
       },
       create: (condition) => {
         return userDummy;
+      }
+    };
+
+    private message = {
+      findUnique: (condition) => {
+        if(condition.where?.email === 'existent@user.com'){
+          return messageDummy;
+        }
+  
+        return false
+      },
+      create: (condition) => {
+        return messageDummy;
       }
     };
 }
