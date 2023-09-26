@@ -93,17 +93,39 @@ describe('User Service', () => {
       expect(Object.keys(result)).toStrictEqual(Object.keys(userDummy));
     });
   });
-
+  
   describe('[getUser] user not foud', () => {
     it('should return a User not found error', async () => {
       const result: any = await userService.getUser({
         email: 'nonexistent@user.com',
       });
-
+      
       expect(result instanceof BadRequestException).toBe(true);
       expect(result.message).toBe('User not found');
     });
   });
+  
+  describe('[getUserById]', () => {
+    it('should return a user', async () => {
+      const result = await userService.getUserById({
+        id: 'existentId',
+      });
+      
+      expect(Object.keys(result)).toStrictEqual(Object.keys(userDummy));
+    });
+  });
+
+  describe('[getUserById] user not foud', () => {
+    it('should return a User not found error', async () => {
+      const result: any = await userService.getUserById({
+        id: '123',
+      });
+      
+      expect(result instanceof BadRequestException).toBe(true);
+      expect(result.message).toBe('User not found');
+    });
+  });
+  
 });
 
 describe('User Controller', () => {

@@ -36,6 +36,9 @@ export class PrismaServiceMock {
         if(condition.where?.email === 'existent@user.com'){
           return userDummy;
         }
+        if(condition.where?.id === 'existentId'){
+          return userDummy;
+        }
   
         return false
       },
