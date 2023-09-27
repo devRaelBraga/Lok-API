@@ -7,7 +7,7 @@ export const jwtTokenDummy:loginReturnDTO = {
     profilePicUrl: 'profilePicUrl',
     privateKey: 'privateKey',
     token: 'token'
-}
+};
 
 export const userDummy: User = {
     id: '1234-5678-9101',
@@ -26,4 +26,12 @@ export const messageDummy: Message = {
     receiverId: '1098-7654-3210',
     content: 'Hello World!',
     timestamp: new Date(),
-}
+};
+
+export const criptedMessageDummy: string = 'Hello World!'; // PUT HASH HERE
+
+export const deCriptedMessageDummy: string = 'Hello World!';
+
+export const privateKeyDummy: string = 'privateKey';
+
+export const publicKeyDummy: string = 'publicKey';
