@@ -3,6 +3,7 @@ import { jwtTokenDummy, messageDummy, userDummy } from "./dummies";
 import { loginReturnDTO } from "src/modules/auth/auth.dto";
 import { createUserDTO } from "src/modules/user/user.dto";
 import { UsersService } from "src/modules/user/user.service";
+import { BadRequestException } from "@nestjs/common";
 
 export class UserServiceMock {
     async getUser({email}): Promise<User> {
@@ -14,7 +15,14 @@ export class UserServiceMock {
     }
 
     async getUserById({ id }: { id: string; }): Promise<User> {
-      return userDummy;
+      try {
+        if(id === '000'){
+          throw new BadRequestException('User not found');
+        }
+        return userDummy;
+      } catch (error) {
+        return error;
+      }
     }
 }
 
@@ -48,15 +56,27 @@ export class PrismaServiceMock {
     };
 
     private message = {
-      findUnique: (condition) => {
-        if(condition.where?.email === 'existent@user.com'){
-          return messageDummy;
-        }
-  
-        return false
-      },
       create: (condition) => {
         return messageDummy;
+      },
+      findMany: (condition) => {
+        return [
+          messageDummy,
+          messageDummy
+        ]
       }
     };
 }
+
+export class MessageServiceMock {
+  async createMessage() {
+    return messageDummy;
+  }
+
+  async getChatHistory() {
+    return [
+      messageDummy,
+      messageDummy
+    ]
+  }
+};
