@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EncriptionService } from './encription.service';
-import { criptedMessageDummy, deCriptedMessageDummy, privateKeyDummy, publicKeyDummy } from 'test/mocks/dummies';
+import { criptedMessageDummy, deCriptedMessageDummy, privateKeyDummy, publicKeyDummy } from '../../../test/mocks/dummies';
 
 describe('Encription Service', () => {
   let encriptionService: EncriptionService;
