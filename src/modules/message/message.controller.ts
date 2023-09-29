@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Req, BadRequestException } from '@nestjs/common';
 import { Request } from 'express';
 import { MessageService } from './message.service';
+import { ApiBody } from '@nestjs/swagger';
+import { getChatHistorySwagger, sendMessageSwagger } from './message.swagger';
 
 
 @Controller('/message')
@@ -8,6 +10,7 @@ export class MessageController{
     constructor(private readonly messageService: MessageService) {}
 
     @Post('/send')
+    @ApiBody(sendMessageSwagger)
     async sendMessage(@Req() request: Request) {
         try {
             const {senderId, receiverId, content} = request.body;
@@ -27,6 +30,7 @@ export class MessageController{
     }
 
     @Post()
+    @ApiBody(getChatHistorySwagger)
     async getChatHistory(@Req() request: Request) {
         try {
             const {user1Id, user2Id} = request.body;

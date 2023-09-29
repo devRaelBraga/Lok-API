@@ -3,14 +3,15 @@ import { UsersService } from './user.service';
 import { User } from '@prisma/client';
 import { createUserDTO } from './user.dto';
 import { Request } from 'express';
-
+import { ApiBody } from '@nestjs/swagger';
+import { createUserSwagger } from './user.swagger';
 
 @Controller('/user')
 export class UserController {
     constructor(private readonly userService: UsersService) {}
 
-    
-    @Post()
+    @Post('/create')
+    @ApiBody(createUserSwagger)
     async createUser(@Req() request: Request): Promise<User> {
         try {
             const {name, email, password} = request.body;
@@ -31,5 +32,5 @@ export class UserController {
         } catch (error) {
             return error;
         }
-  }
+    }
 }

@@ -2,6 +2,8 @@ import { Controller, Post, Req, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { loginDTO, loginReturnDTO } from './auth.dto';
 import { Request } from 'express';
+import { ApiBody } from '@nestjs/swagger';
+import { loginSwagger } from './auth.swagger';
 
 
 @Controller('/auth')
@@ -10,6 +12,7 @@ export class AuthController {
 
     
     @Post('/login')
+    @ApiBody(loginSwagger)
     async login(@Req() request: Request): Promise<loginReturnDTO> {
         try {
             const {email, password}:loginDTO = request.body;
