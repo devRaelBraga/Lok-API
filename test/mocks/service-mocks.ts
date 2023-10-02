@@ -24,6 +24,10 @@ export class UserServiceMock {
         return error;
       }
     }
+
+    async updateUser(){
+      return userDummy;
+    }
 }
 
 export class AuthServiceMock {
@@ -52,6 +56,12 @@ export class PrismaServiceMock {
       },
       create: (condition) => {
         return userDummy;
+      },
+      update: (condition) => {
+        if(condition.where?.id === '123'){
+          return false;
+        }
+        return {...userDummy, name: 'Joshua'};
       }
     };
 
