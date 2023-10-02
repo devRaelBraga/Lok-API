@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../../../config/database/prisma.service';
-import { createUserDTO, getUserDTO } from './user.dto';
+import { createUserDTO, getUserByIdDTO, getUserDTO, updateUserDTO } from './user.dto';
 import * as bcrypt from 'bcrypt';
 
 
 @Injectable()
 export class UsersService {
     constructor(private prisma: PrismaService){}
+    private saltRounds = 10;
 
     async createUser({name, email, password}: createUserDTO): Promise<User>{
-        const saltRounds = 10;
 
         try {
             const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
@@ -37,7 +37,7 @@ export class UsersService {
                 throw new BadRequestException('User already exists')
             }
 
-            const hash = await bcrypt.hash(password, saltRounds);
+            const hash = await bcrypt.hash(password, this.saltRounds);
     
             return await this.prisma.user.create(
                 { data: {
@@ -75,7 +75,7 @@ export class UsersService {
 
     }
 
-    async getUserById({id}:{id:string}): Promise<User> {
+    async getUserById({id}: getUserByIdDTO): Promise<User> {
         try {
             const user = await this.prisma.user.findUnique({
                 where: {
@@ -89,6 +89,29 @@ export class UsersService {
 
             return user;
             
+        } catch (error) {
+            return error;
+        }
+    }
+
+    async updateUser(updates: updateUserDTO): Promise<User>{
+        try {
+            if(updates.password){
+                updates.password = await bcrypt.hash(updates.password, this.saltRounds);
+            };
+
+            const result = await this.prisma.user.update({
+                where: {
+                    id: updates.id
+                },
+                data: {...updates}
+            });
+
+            if(!result){
+                throw new BadRequestException('User not found');
+            };
+            
+            return result;
         } catch (error) {
             return error;
         }
