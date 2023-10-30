@@ -2,6 +2,8 @@ export interface createUserDTO {
     name: string;
     email: string;
     password: string;
+    identityKey: string;
+    photo: string;
 }
 export interface getUserDTO {
     email: string;

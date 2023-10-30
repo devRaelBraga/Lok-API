@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Post, Put, Req } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Post, Put, Req } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { User } from '@prisma/client';
 import { createUserDTO, updateUserDTO } from './user.dto';
@@ -15,7 +15,9 @@ export class UserController {
     @ApiTags('User')
     async createUser(@Req() request: Request): Promise<User> {
         try {
-            const {name, email, password} = request.body;
+            console.log(request.body)
+            let {name, email, password, identityKey} = request.body;
+            let photo: string = request.body.photo;
 
             if(!name || typeof(name) !== 'string' || name.length === 0) {
                 throw new BadRequestException('Name is required');
@@ -29,8 +31,14 @@ export class UserController {
                 throw new BadRequestException('Password is required');
             }
 
-            return await this.userService.createUser({name, email, password});
+            if(!identityKey || typeof(identityKey) !== 'string' || password.length === 0) {
+                throw new BadRequestException('IdentityKey is required');
+            }
+            photo = photo.split(',')[1]
+
+            return await this.userService.createUser({name, email, password, identityKey, photo});
         } catch (error) {
+            console.log(error);
             return error;
         }
     }
@@ -59,5 +67,10 @@ export class UserController {
         } catch (error) {
             return error;
         }
+    }
+
+    @Get()
+    async getAllUsers(){
+        return this.userService.getAllUsers();
     }
 }

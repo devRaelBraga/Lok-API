@@ -12,10 +12,22 @@ User:
 | email | string |
 | password | string |
 | profilePicUrl | string |
-| publicKey | string |
-| privateKey | string |
+| identityKey | string |
+| signedPreKey | string |
+| oneTimeKeys | string[] |
 | createdAt | date |
 | updatedAt | date |
+
+Chat:
+| Attribute | Description |
+| ----- | ------- |
+| senderID | string |
+| receiverID | string |
+| senderIdentityKey | string |
+| senderEphemeralKey | string |
+| receiverIdentityKey | string |
+| receiverSignedPreKey | string |
+| receiverOneTimeKey? | string |
 
 
 Message:
@@ -23,6 +35,7 @@ Message:
 | ----- | ------- |
 | receiverID | string |
 | senderID | string |
+| rootKey | string |
 | content | string |
 | timestamp | date |
 

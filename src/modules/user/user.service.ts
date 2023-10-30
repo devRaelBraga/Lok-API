@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
 import { PrismaService } from '../../../config/database/prisma.service';
 import { createUserDTO, getUserByIdDTO, getUserDTO, updateUserDTO } from './user.dto';
 import * as bcrypt from 'bcrypt';
+import { User } from '@prisma/client';
+import { S3_UploadImage } from 'src/s3.handler';
 
 
 @Injectable()
@@ -10,9 +11,10 @@ export class UsersService {
     constructor(private prisma: PrismaService){}
     private saltRounds = 10;
 
-    async createUser({name, email, password}: createUserDTO): Promise<User>{
+    async createUser({name, email, password, identityKey, photo}: createUserDTO): Promise<User>{
 
         try {
+            // console.log({photo})
             const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
     
             if(name.length < 3) {
@@ -38,18 +40,19 @@ export class UsersService {
             }
 
             const hash = await bcrypt.hash(password, this.saltRounds);
+            const pic = await S3_UploadImage({userEmail: email, data: photo});
     
             return await this.prisma.user.create(
                 { data: {
                     name,
                     email,
                     password: hash,
-                    profilePicUrl: '',
-                    publicKey: '',
-                    privateKey: '',
+                    profilePicUrl: pic,
+                    identityKey,
                 }
             })
         } catch (error) {
+            console.log(error);
             return error
         }
         
@@ -112,6 +115,23 @@ export class UsersService {
             };
             
             return result;
+        } catch (error) {
+            return error;
+        }
+    }
+
+    async getAllUsers(){
+        try {
+            const users = await this.prisma.user.findMany({
+                select: {
+                    name: true,
+                    email: true,
+                    identityKey: true,
+                    profilePicUrl: true
+                }
+            })
+
+            return users
         } catch (error) {
             return error;
         }

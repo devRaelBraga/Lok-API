@@ -13,6 +13,7 @@ export class AuthService {
     async login({email, password}: loginDTO): Promise<loginReturnDTO> {
         try {
             const user = await this.userService.getUser({email});
+            console.log(user);
 
             if(user instanceof BadRequestException) {
                 throw new BadRequestException('User not found');
@@ -33,11 +34,12 @@ export class AuthService {
                 name: user.name,
                 email: user.email, 
                 profilePicUrl: user.profilePicUrl,
-                privateKey: user.privateKey,
+                identityKey: user.identityKey,
                 token: token
             };
 
         } catch (error) {
+            console.log(error);
             return error;
         }
     }

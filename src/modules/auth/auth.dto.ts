@@ -7,6 +7,6 @@ export interface loginReturnDTO {
     name: string,
     email: string, 
     profilePicUrl: string,
-    privateKey: string,
+    identityKey: string,
     token: string
 }
