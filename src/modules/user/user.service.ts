@@ -120,9 +120,19 @@ export class UsersService {
         }
     }
 
-    async getAllUsers(){
+    async getAllUsers({id}){
         try {
-            const users = await this.prisma.user.findMany({
+            if(String(id).includes('@')){
+                id = await this.prisma.user.findUnique({
+                    where: {
+                        email: id
+                    }
+                })
+                id = id.id
+            }
+
+
+            const users: any[] = await this.prisma.user.findMany({
                 select: {
                     name: true,
                     email: true,
@@ -131,7 +141,42 @@ export class UsersService {
                 }
             })
 
-            return users
+            var groups: any[] = await this.prisma.usersOnGroups.findMany({
+                where: {
+                    userId: id,
+                },
+                select: {
+                    groupId: true,
+                }
+            })
+
+            groups = groups.map(group =>
+                group.groupId
+            )
+
+            console.log(groups)
+
+            groups = await this.prisma.group.findMany({
+                where:{
+                    OR: [
+                        {
+                            adminId: {
+                                equals: id
+                            }
+                        },
+                        {
+                            id: {
+                                in: groups
+                            }
+                        }
+                    ]
+                }
+            })
+
+            const response = [...groups, ...users]
+
+
+            return response
         } catch (error) {
             return error;
         }

@@ -11,9 +11,10 @@ interface S3DTO {
     data: string;
 }
 
-export async function S3_UploadImage({userEmail, data}:S3DTO): Promise<string>{
+export async function Group_S3({userEmail, data}:S3DTO): Promise<string>{
     let image;
     var now = String(Date.now());
+    data = data.split(',')[1]
 
     if(!(userEmail&&data)){
         console.log('oi')
@@ -49,7 +50,7 @@ export async function S3_UploadImage({userEmail, data}:S3DTO): Promise<string>{
     try {
         const params = {                        // params to S3
             Bucket: bucket,
-            Key: 'pics/'+ fileName, 
+            Key: 'pics/groups/'+ fileName, 
             Body: image,
         };
 
@@ -57,7 +58,7 @@ export async function S3_UploadImage({userEmail, data}:S3DTO): Promise<string>{
         
         unlinkSync(tempFile);
         
-        return `https://infra-track.s3.amazonaws.com/pics/` + fileName
+        return `https://infra-track.s3.amazonaws.com/pics/groups/` + fileName
         
     } catch (err) {
         unlinkSync(tempFile);

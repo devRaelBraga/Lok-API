@@ -69,8 +69,10 @@ export class UserController {
         }
     }
 
-    @Get()
-    async getAllUsers(){
-        return this.userService.getAllUsers();
+    @Post()
+    async getAllUsers(@Req() request: Request){
+        const {id} = request.body;
+
+        return this.userService.getAllUsers({id});
     }
 }

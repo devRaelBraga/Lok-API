@@ -46,4 +46,57 @@ export class MessageController{
             return error;
         }
     }
+
+    @Post('/group')
+    async createGroup(@Req() request: Request) {
+        try {
+            const {adminId, name, groupPic} = request.body;
+
+            // console.log(adminId, name, groupPic)
+
+            if(!adminId || !name) {
+                throw new BadRequestException('Invalid request');
+            }
+
+            return await this.messageService.createGroup({adminId, name, groupPic})
+
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    @Post('/group/addUser')
+    async addUser(@Req() request: Request) {
+        try {
+            
+            const {adminId, name, userEmail} = request.body;
+
+            if(!adminId || !name || !userEmail) {
+                throw new BadRequestException('Invalid request');
+            }
+
+            const response = await this.messageService.addUser({adminId, name, userEmail})
+            console.log(response)
+            return response
+
+        } catch (error) {
+            console.log(error);
+            return error
+        }
+    }
+
+    @Post('/group/usersOnGroup')
+    async getUsersOnGroup(@Req() request: Request) {
+        try {
+            
+            const {groupId} = request.body;
+
+            return await this.messageService.getUsersToAddToGroup({groupId})
+
+        } catch (error) {
+            console.log(error);
+            return error
+        }
+    }
 }

@@ -10,7 +10,7 @@ async function bootstrap() {
 
 
   app.enableCors();
-  app.useBodyParser('json', { limit: '50mb' });
+  app.useBodyParser('json', { limit: '100mb' });
 
   const config = new DocumentBuilder()
     .setTitle('Chat API Documentation')
